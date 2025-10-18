@@ -6,6 +6,14 @@ export interface DirectorySubmission {
   status: 'pending' | 'submitted' | 'approved' | 'rejected';
   submissionDate: Date;
   nextResubmission?: Date;
+  tier?: 'Essential' | 'High Impact' | 'Growth';
+  focusArea?: 'Local' | 'Startup' | 'Product' | 'Review' | 'Community' | 'Niche';
+  automation?: 'auto' | 'manual';
+  notes?: string;
+  aiDescription?: string;
+  aiStatus?: 'generated' | 'draft' | 'regenerating';
+  lastAiGeneration?: Date;
+  anthropicModel?: string;
 }
 
 export interface DuplicateDetection {
@@ -34,4 +42,34 @@ export interface OutreachTemplate {
   subject: string;
   body: string;
   category: string;
+}
+
+export interface AutomationTask {
+  id: string;
+  name: string;
+  cadence: 'monthly' | 'quarterly' | 'weekly';
+  nextRun: Date;
+  owner: string;
+  status: 'scheduled' | 'in-progress' | 'completed';
+  impact: 'critical' | 'high' | 'medium';
+  relatedDirectories: string[];
+  notes?: string;
+}
+
+export interface SeoTask {
+  id: string;
+  label: string;
+  category: 'Listing' | 'Content' | 'Review' | 'Optimization';
+  impactScore: number;
+  status: 'queued' | 'active' | 'done';
+  owner: string;
+  dueDate: Date;
+}
+
+export interface AiGenerationSummary {
+  totalDirectories: number;
+  uniqueDescriptions: number;
+  averageTokens: number;
+  lastRun: Date;
+  model: string;
 }
