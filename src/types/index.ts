@@ -3,7 +3,7 @@ export interface DirectorySubmission {
   directoryName: string;
   url: string;
   domainAuthority: number;
-  status: 'pending' | 'submitted' | 'approved' | 'rejected';
+  status: 'pending' | 'submitted' | 'approved' | 'rejected' | 'pets';
   submissionDate: Date;
   nextResubmission?: Date;
   tier?: 'Essential' | 'High Impact' | 'Growth';

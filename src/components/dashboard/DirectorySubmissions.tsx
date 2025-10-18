@@ -46,7 +46,15 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
     if (name.includes('product') || name.includes('software') || name.includes('app')) {
       return 'Product';
     }
-    if (name.includes('blog') || name.includes('news') || name.includes('community') || name.includes('hackers')) {
+    if (
+      name.includes('blog') ||
+      name.includes('news') ||
+      name.includes('community') ||
+      name.includes('hackers') ||
+      name.includes('cat') ||
+      name.includes('feline') ||
+      name.includes('pet')
+    ) {
       return 'Community';
     }
     return 'Niche';
@@ -95,6 +103,8 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/30';
       case 'pending':
         return 'bg-amber-500/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/30';
+      case 'pets':
+        return 'bg-pink-500/20 text-pink-300 border-pink-500/30 hover:bg-pink-500/30';
       case 'rejected':
         return 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30';
       default:
@@ -111,7 +121,8 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
   };
 
   const totalDirectories = submissions.length;
-  const approvedCount = submissions.filter((sub) => sub.status === 'approved').length;
+  const pendingCount = submissions.filter((sub) => sub.status === 'pending').length;
+  const petCount = submissions.filter((sub) => sub.status === 'pets').length;
   const aiGeneratedCount = submissions.filter((sub) => sub.aiStatus === 'generated').length;
   const aiDraftCount = submissions.filter((sub) => sub.aiStatus === 'draft').length;
 
@@ -146,7 +157,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
               Directory Submissions
             </CardTitle>
             <CardDescription className="text-slate-400">
-              Top {totalDirectories} directories and channels • {approvedCount} live • {aiGeneratedCount} with Anthropic copy • {aiDraftCount} drafting
+              Top {totalDirectories} directories and channels • {pendingCount} awaiting launch • {petCount} tuned for cat guardians • {aiGeneratedCount} with Anthropic copy
             </CardDescription>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -169,6 +180,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                 <SelectItem value="submitted">Submitted</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="pets">Pet Audience</SelectItem>
               </SelectContent>
             </Select>
             <Select value={sortBy} onValueChange={setSortBy}>

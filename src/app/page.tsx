@@ -36,6 +36,7 @@ const statusPalette: Record<DirectorySubmission['status'], string> = {
   submitted: '#60a5fa',
   pending: '#facc15',
   rejected: '#f87171',
+  pets: '#f472b6',
 };
 
 const formatDayLabel = (date: Date) =>
@@ -67,18 +68,22 @@ const getFocusArea = (submission: DirectorySubmission): NonNullable<DirectorySub
 
 export default function Page() {
   const totalSubmissions = mockDirectorySubmissions.length;
-  const statusCounts = mockDirectorySubmissions.reduce<Record<DirectorySubmission['status'], number>>((acc, submission) => {
-    acc[submission.status] = (acc[submission.status] ?? 0) + 1;
-    return acc;
-  }, {
-    approved: 0,
-    submitted: 0,
-    pending: 0,
-    rejected: 0,
-  });
+  const statusCounts = mockDirectorySubmissions.reduce<Record<DirectorySubmission['status'], number>>(
+    (acc, submission) => {
+      acc[submission.status] = (acc[submission.status] ?? 0) + 1;
+      return acc;
+    },
+    {
+      approved: 0,
+      submitted: 0,
+      pending: 0,
+      rejected: 0,
+      pets: 0,
+    },
+  );
 
-  const liveCount = statusCounts.approved ?? 0;
-  const inReviewCount = (statusCounts.pending ?? 0) + (statusCounts.submitted ?? 0);
+  const pendingCount = statusCounts.pending ?? 0;
+  const petsCount = statusCounts.pets ?? 0;
   const averageDomainAuthority = Math.round(
     mockDirectorySubmissions.reduce((acc, submission) => acc + submission.domainAuthority, 0) / totalSubmissions,
   );
@@ -132,7 +137,7 @@ export default function Page() {
       submissions: entry.submissions,
     }));
 
-  const statusBreakdown = (['approved', 'submitted', 'pending', 'rejected'] as DirectorySubmission['status'][])
+  const statusBreakdown = (['pending', 'pets', 'submitted', 'approved', 'rejected'] as DirectorySubmission['status'][])
     .map((status) => ({
       status,
       value: statusCounts[status] ?? 0,
@@ -141,7 +146,6 @@ export default function Page() {
     .filter((item) => item.value > 0);
 
   const topListings = [...mockDirectorySubmissions]
-    .filter((submission) => submission.status === 'approved')
     .sort((a, b) => b.domainAuthority - a.domainAuthority)
     .slice(0, 5);
 
@@ -149,8 +153,12 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
-      <div className="mx-auto max-w-7xl px-6 py-12 space-y-10">
-        <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+    <div className="mx-auto max-w-7xl px-6 py-12 space-y-10">
+      <section>
+        <DirectorySubmissions submissions={mockDirectorySubmissions} />
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
           <Card className="border-slate-800 bg-slate-900/90">
             <CardHeader className="space-y-4">
               <div className="flex items-center gap-3">
@@ -159,7 +167,7 @@ export default function Page() {
                 </div>
                 <div>
                   <CardTitle className="text-4xl font-bold tracking-tight text-slate-100">
-                    Listings & Social HQ
+                    SEMsubmit
                   </CardTitle>
                   <CardDescription className="text-base text-slate-400">
                     A calm command center for every live profile, social launch, and Anthropic-ready description.
@@ -168,14 +176,14 @@ export default function Page() {
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">Live coverage</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-100">{liveCount}</p>
-                  <p className="text-xs text-slate-400">Directories and channels published</p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Pending queue</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-100">{pendingCount}</p>
+                  <p className="text-xs text-slate-400">Directories and channels waiting for launch</p>
                 </div>
                 <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">In motion</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-100">{inReviewCount}</p>
-                  <p className="text-xs text-slate-400">Awaiting approval or scheduled launch</p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Pet network</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-100">{petsCount}</p>
+                  <p className="text-xs text-slate-400">Cat parent touchpoints ready for outreach</p>
                 </div>
                 <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
                   <p className="text-xs uppercase tracking-wide text-slate-500">Avg. domain authority</p>
@@ -215,18 +223,18 @@ export default function Page() {
 
         <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard
-            title="Live directories"
-            value={liveCount}
-            description="Approved listings with final copy"
+            title="Pending directories"
+            value={pendingCount}
+            description="Listings staged for activation"
             icon={TrendingUp}
             trend={{ value: 5, isPositive: true }}
           />
           <MetricCard
-            title="In review"
-            value={inReviewCount}
-            description="Pending or submitted placements"
+            title="Pet audience outlets"
+            value={petsCount}
+            description="Cat-focused communities ready for placement"
             icon={Compass}
-            trend={{ value: 3, isPositive: true }}
+            trend={{ value: 7, isPositive: true }}
           />
           <MetricCard
             title="Anthropic coverage"
@@ -238,7 +246,7 @@ export default function Page() {
           <MetricCard
             title="Community platforms"
             value={communityCoverage}
-            description="Social and community channels online"
+            description="Social and community channels aligned to cats"
             icon={Layers}
             trend={{ value: 4, isPositive: true }}
           />
@@ -341,12 +349,9 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="grid gap-6 xl:grid-cols-[2fr_1fr]">
-          <DirectorySubmissions submissions={mockDirectorySubmissions} />
-          <div className="space-y-6">
-            <BlogOutreach contacts={mockBlogContacts} />
-            <TemplateLibrary templates={mockOutreachTemplates} />
-          </div>
+        <section className="grid gap-6 xl:grid-cols-2">
+          <BlogOutreach contacts={mockBlogContacts} />
+          <TemplateLibrary templates={mockOutreachTemplates} />
         </section>
       </div>
     </div>
