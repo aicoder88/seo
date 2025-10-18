@@ -89,7 +89,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       <div className="container mx-auto p-6 space-y-10">
-        <div className="space-y-6 pt-8">
+        <section id="overview" className="space-y-6 pt-8">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl shadow-lg shadow-blue-500/20">
               <Sparkles className="h-8 w-8 text-white" />
@@ -175,7 +175,7 @@ export default function Page() {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard
@@ -208,57 +208,61 @@ export default function Page() {
           />
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
+        <section id="automation" className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
           <AutomationTimeline tasks={mockAutomationTasks} />
           <AiCopySummary summary={aiSummary} />
-        </div>
+        </section>
 
-        <ImpactTaskBoard tasks={mockSeoTasks} />
+        <section id="tasks">
+          <ImpactTaskBoard tasks={mockSeoTasks} />
+        </section>
 
-        <Tabs defaultValue="submissions" className="space-y-6">
-          <TabsList className="grid w-full gap-2 rounded-full bg-slate-900/70 p-2 shadow-inner shadow-slate-900/60 sm:grid-cols-4">
-            <TabsTrigger
-              value="submissions"
-              className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
-            >
-              Directory Submissions
-            </TabsTrigger>
-            <TabsTrigger
-              value="duplicates"
-              className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
-            >
-              Duplicate Detection
-            </TabsTrigger>
-            <TabsTrigger
-              value="outreach"
-              className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
-            >
-              Blog Outreach
-            </TabsTrigger>
-            <TabsTrigger
-              value="templates"
-              className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
-            >
-              Templates
-            </TabsTrigger>
-          </TabsList>
+        <section id="library" className="space-y-6">
+          <Tabs defaultValue="submissions" className="space-y-6">
+            <TabsList className="grid w-full gap-2 rounded-full bg-slate-900/70 p-2 shadow-inner shadow-slate-900/60 sm:grid-cols-4">
+              <TabsTrigger
+                value="submissions"
+                className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
+              >
+                Directory Submissions
+              </TabsTrigger>
+              <TabsTrigger
+                value="duplicates"
+                className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
+              >
+                Duplicate Detection
+              </TabsTrigger>
+              <TabsTrigger
+                value="outreach"
+                className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
+              >
+                Blog Outreach
+              </TabsTrigger>
+              <TabsTrigger
+                value="templates"
+                className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
+              >
+                Templates
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="submissions" className="space-y-4">
-            <DirectorySubmissions submissions={mockDirectorySubmissions} />
-          </TabsContent>
+            <TabsContent value="submissions" className="space-y-4">
+              <DirectorySubmissions submissions={mockDirectorySubmissions} />
+            </TabsContent>
 
-          <TabsContent value="duplicates" className="space-y-4">
-            <DuplicateDetectionPanel detections={mockDuplicateDetections} />
-          </TabsContent>
+            <TabsContent value="duplicates" className="space-y-4">
+              <DuplicateDetectionPanel detections={mockDuplicateDetections} />
+            </TabsContent>
 
-          <TabsContent value="outreach" className="space-y-4">
-            <BlogOutreach contacts={mockBlogContacts} />
-          </TabsContent>
+            <TabsContent value="outreach" className="space-y-4">
+              <BlogOutreach contacts={mockBlogContacts} />
+            </TabsContent>
 
-          <TabsContent value="templates" className="space-y-4">
-            <TemplateLibrary templates={mockOutreachTemplates} />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="templates" className="space-y-4">
+              <TemplateLibrary templates={mockOutreachTemplates} />
+            </TabsContent>
+          </Tabs>
+        </section>
       </div>
     </div>
   );

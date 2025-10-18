@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
+import { GlobalNavbar } from "@/components/global-navbar";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,8 +18,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        {children}
+      <body className={`${inter.className} bg-slate-950 text-slate-100`}>
+        <GlobalNavbar />
+        <main className="pt-16">
+          {children}
+        </main>
       </body>
     </html>
   );
