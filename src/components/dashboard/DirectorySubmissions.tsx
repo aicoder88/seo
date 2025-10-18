@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ExternalLink, Calendar, RefreshCw, Search, CalendarClock, Bot, Sparkles } from 'lucide-react';
+import { ExternalLink, Search, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -52,8 +52,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
     return 'Niche';
   };
 
-  const getAutomationMode = (submission: DirectorySubmission) => submission.automation ?? 'manual';
-
   const getTierColor = (tier: NonNullable<DirectorySubmission['tier']>) => {
     switch (tier) {
       case 'Essential':
@@ -81,11 +79,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
     }
   };
 
-  const getAutomationColor = (mode: 'auto' | 'manual') =>
-    mode === 'auto'
-      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-      : 'bg-slate-500/20 text-slate-300 border-slate-500/30';
-
   const formatDate = (date?: Date) =>
     date
       ? date.toLocaleDateString('en-US', {
@@ -93,15 +86,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
           day: 'numeric',
         })
       : '—';
-
-  const now = new Date();
-  const fourteenDays = 1000 * 60 * 60 * 24 * 14;
-  const isDueSoon = (date?: Date) =>
-    Boolean(
-      date &&
-        date.getTime() >= now.getTime() &&
-        date.getTime() - now.getTime() <= fourteenDays,
-    );
 
   const getStatusColor = (status: DirectorySubmission['status']) => {
     switch (status) {
@@ -128,8 +112,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
 
   const totalDirectories = submissions.length;
   const approvedCount = submissions.filter((sub) => sub.status === 'approved').length;
-  const automationCount = submissions.filter((sub) => getAutomationMode(sub) === 'auto').length;
-  const dueSoonCount = submissions.filter((sub) => isDueSoon(sub.nextResubmission)).length;
   const aiGeneratedCount = submissions.filter((sub) => sub.aiStatus === 'generated').length;
   const aiDraftCount = submissions.filter((sub) => sub.aiStatus === 'draft').length;
 
@@ -149,10 +131,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
       return b.submissionDate.getTime() - a.submissionDate.getTime();
     } else if (sortBy === 'da') {
       return b.domainAuthority - a.domainAuthority;
-    } else if (sortBy === 'resubmission') {
-      const aTime = a.nextResubmission ? a.nextResubmission.getTime() : Infinity;
-      const bTime = b.nextResubmission ? b.nextResubmission.getTime() : Infinity;
-      return aTime - bTime;
     } else if (sortBy === 'name') {
       return a.directoryName.localeCompare(b.directoryName);
     }
@@ -168,7 +146,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
               Directory Submissions
             </CardTitle>
             <CardDescription className="text-slate-400">
-              Top {totalDirectories} high-impact SEO directories • {approvedCount} live • {automationCount} automated • {aiGeneratedCount} Anthropic unique • {aiDraftCount} drafting • {dueSoonCount} due within 14d
+              Top {totalDirectories} directories and channels • {approvedCount} live • {aiGeneratedCount} with Anthropic copy • {aiDraftCount} drafting
             </CardDescription>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -200,7 +178,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
               <SelectContent className="bg-slate-900 border-slate-700">
                 <SelectItem value="da">Domain Authority</SelectItem>
                 <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="resubmission">Next Resubmission</SelectItem>
                 <SelectItem value="name">Name</SelectItem>
               </SelectContent>
             </Select>
@@ -213,7 +190,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
             {essentialHighlights.map((highlight) => {
               const tier = getTier(highlight);
               const focus = getFocusArea(highlight);
-              const mode = getAutomationMode(highlight);
               return (
                 <div
                   key={highlight.id}
@@ -228,23 +204,40 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                         {focus}
                       </Badge>
                     </span>
-                    <span className="text-slate-500">DA {highlight.domainAuthority}</span>
+                    <Badge variant="outline" className={`font-semibold ${getStatusColor(highlight.status)}`}>
+                      {highlight.status}
+                    </Badge>
                   </div>
-                  <div className="mt-3">
-                    <p className="text-lg font-semibold text-slate-100">{highlight.directoryName}</p>
-                    <p className="text-sm text-slate-400 mt-1">
-                      {mode === 'auto' ? 'Automated refresh' : 'Manual refresh'} • {highlight.notes ?? 'Keep listing evergreen.'}
+                  <div className="mt-3 space-y-2">
+                    <p className="text-lg font-semibold text-slate-100 leading-tight">{highlight.directoryName}</p>
+                    <p className="text-sm text-slate-400">{highlight.notes ?? 'Keep listing fresh with current messaging.'}</p>
+                    <p className="text-xs text-slate-500">Last updated {formatDate(highlight.submissionDate)}</p>
+                  </div>
+                  {highlight.aiDescription && (
+                    <p className="mt-4 text-xs text-slate-400 line-clamp-3">
+                      “{highlight.aiDescription}”
                     </p>
-                  </div>
+                  )}
                   <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
-                    <span className="flex items-center gap-1">
-                      <CalendarClock className="h-3 w-3" />
-                      Next: {formatDate(highlight.nextResubmission)}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Bot className={`h-3 w-3 ${mode === 'auto' ? 'text-emerald-400' : 'text-slate-500'}`} />
-                      {mode === 'auto' ? 'AI scheduled' : 'Needs owner review'}
-                    </span>
+                    <span>DA {highlight.domainAuthority}</span>
+                    {highlight.aiStatus && (
+                      <Badge
+                        variant="outline"
+                        className={`font-semibold ${
+                          highlight.aiStatus === 'generated'
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                            : highlight.aiStatus === 'regenerating'
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                            : 'bg-slate-500/20 text-slate-300 border-slate-500/30'
+                        }`}
+                      >
+                        {highlight.aiStatus === 'generated'
+                          ? 'Unique copy'
+                          : highlight.aiStatus === 'regenerating'
+                          ? 'Refreshing'
+                          : 'Draft'}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               );
@@ -261,11 +254,8 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                   <TableHead className="text-slate-300">Focus</TableHead>
                   <TableHead className="text-slate-300">DA Score</TableHead>
                   <TableHead className="text-slate-300">Status</TableHead>
-                  <TableHead className="text-slate-300">Last Submission</TableHead>
-                  <TableHead className="text-slate-300">Next Resubmission</TableHead>
-                  <TableHead className="text-slate-300">Automation</TableHead>
-                  <TableHead className="text-slate-300">Anthropic Copy</TableHead>
-                  <TableHead className="text-right text-slate-300">Actions</TableHead>
+                  <TableHead className="text-slate-300">Last Updated</TableHead>
+                  <TableHead className="text-slate-300">Content</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -314,27 +304,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                       <TableCell className="text-slate-400 text-sm">
                         {formatDate(submission.submissionDate)}
                       </TableCell>
-                      <TableCell className="text-slate-400 text-sm">
-                        {submission.nextResubmission ? (
-                          <Badge
-                            variant="outline"
-                            className={`font-semibold ${
-                              isDueSoon(submission.nextResubmission)
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                                : 'bg-slate-800/80 text-slate-300 border-slate-700/50'
-                            }`}
-                          >
-                            {formatDate(submission.nextResubmission)}
-                          </Badge>
-                        ) : (
-                          <span className="text-slate-600">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={`font-semibold ${getAutomationColor(getAutomationMode(submission))}`}>
-                          {getAutomationMode(submission) === 'auto' ? 'Automated' : 'Manual'}
-                        </Badge>
-                      </TableCell>
                       <TableCell>
                         {submission.aiDescription ? (
                           <div className="flex flex-col gap-2">
@@ -350,7 +319,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                                 }`}
                               >
                                 {submission.aiStatus === 'generated'
-                                  ? 'Unique'
+                                  ? 'Unique copy'
                                   : submission.aiStatus === 'regenerating'
                                   ? 'Refreshing'
                                   : 'Draft'}
@@ -371,7 +340,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                               }}
                             >
                               <Sparkles className="h-4 w-4" />
-                              View Anthropic copy
+                              View copy
                             </Button>
                           </div>
                         ) : (
@@ -381,21 +350,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                             className="text-slate-500 hover:text-emerald-300 hover:bg-emerald-500/10"
                           >
                             <Sparkles className="h-4 w-4 mr-1" />
-                            Queue description
-                          </Button>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {submission.nextResubmission && (
-                          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-blue-400 hover:bg-blue-500/10">
-                            <RefreshCw className="h-4 w-4 mr-1" />
-                            Resubmit
-                          </Button>
-                        )}
-                        {submission.status === 'rejected' && (
-                          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-blue-400 hover:bg-blue-500/10">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            Schedule
+                            Generate copy
                           </Button>
                         )}
                       </TableCell>
