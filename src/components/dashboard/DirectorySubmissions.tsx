@@ -126,17 +126,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
     return 'bg-slate-500/20 text-slate-300 border-slate-500/30';
   };
 
-  const totalDirectories = submissions.length;
-  const pendingCount = submissions.filter((sub) => sub.status === 'pending').length;
-  const petCount = submissions.filter((sub) => getFocusArea(sub) === 'Pets').length;
-  const aiGeneratedCount = submissions.filter((sub) => sub.aiStatus === 'generated').length;
-  const aiDraftCount = submissions.filter((sub) => sub.aiStatus === 'draft').length;
-
-  const essentialHighlights = [...submissions]
-    .filter((sub) => getTier(sub) === 'Essential')
-    .sort((a, b) => b.domainAuthority - a.domainAuthority)
-    .slice(0, 4);
-
   const filteredSubmissions = submissions.filter((sub) => {
     const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
     const matchesSearch = sub.directoryName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -190,105 +179,8 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
   };
 
   return (
-    <Card className="relative overflow-hidden border-slate-800/60 bg-slate-950/85 backdrop-blur-xl shadow-2xl shadow-cyan-500/10">
-      <div className="pointer-events-none absolute -top-24 right-0 h-48 w-48 rounded-full bg-cyan-500/25 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 left-6 h-52 w-52 rounded-full bg-blue-500/20 blur-3xl" />
-      <CardHeader className="relative">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <CardTitle className="text-2xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              Directory Submissions
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Top {totalDirectories} directories and channels • {pendingCount} awaiting launch • {petCount} tuned for cat guardians • {aiGeneratedCount} with Anthropic copy
-            </CardDescription>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search directories..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-[200px] bg-slate-800/50 border-slate-700 text-slate-200"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px] bg-slate-800/50 border-slate-700 text-slate-200">
-                <SelectValue placeholder="Filter status" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700">
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="submitted">Submitted</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {essentialHighlights.length > 0 && (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6">
-            {essentialHighlights.map((highlight) => {
-              const tier = getTier(highlight);
-              const focus = getFocusArea(highlight);
-              return (
-                <div
-                  key={highlight.id}
-                  className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-950/70 p-5 shadow-inner shadow-cyan-500/10 transition-all hover:border-cyan-400/60"
-                >
-                  <div className="pointer-events-none absolute -top-16 right-0 h-28 w-28 rounded-full bg-cyan-500/25 blur-3xl" />
-                  <div className="flex items-center justify-between text-xs uppercase tracking-wide text-slate-400">
-                    <span className="flex items-center gap-2">
-                      <Badge variant="outline" className={`font-semibold ${getTierColor(tier)}`}>
-                        {tier}
-                      </Badge>
-                      <Badge variant="outline" className={`font-semibold ${getFocusColor(focus)}`}>
-                        {focus}
-                      </Badge>
-                    </span>
-                    <Badge variant="outline" className={`font-semibold ${getStatusColor(highlight.status)}`}>
-                      {highlight.status}
-                    </Badge>
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    <p className="text-lg font-semibold text-slate-100 leading-tight">{highlight.directoryName}</p>
-                    <p className="text-sm text-slate-400">{highlight.notes ?? 'Keep listing fresh with current messaging.'}</p>
-                    <p className="text-xs text-slate-500">Last updated {formatDate(highlight.submissionDate)}</p>
-                  </div>
-                  {highlight.aiDescription && (
-                    <p className="mt-4 text-xs text-slate-400 line-clamp-3">
-                      “{highlight.aiDescription}”
-                    </p>
-                  )}
-                  <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
-                    <span>DA {highlight.domainAuthority}</span>
-                    {highlight.aiStatus && (
-                      <Badge
-                        variant="outline"
-                        className={`font-semibold ${
-                          highlight.aiStatus === 'generated'
-                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                            : highlight.aiStatus === 'regenerating'
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                            : 'bg-slate-500/20 text-slate-300 border-slate-500/30'
-                        }`}
-                      >
-                        {highlight.aiStatus === 'generated'
-                          ? 'Unique copy'
-                          : highlight.aiStatus === 'regenerating'
-                          ? 'Refreshing'
-                          : 'Draft'}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+    <Card className="relative overflow-hidden border-slate-800/60 bg-slate-950/80 backdrop-blur-xl shadow-2xl shadow-cyan-500/10">
+      <CardContent className="p-0">
         <div className="rounded-lg border border-slate-700/50 overflow-hidden">
           <div className="max-h-[600px] overflow-y-auto">
             <Table>
