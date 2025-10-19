@@ -47,14 +47,15 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
       return 'Product';
     }
     if (
-      name.includes('blog') ||
-      name.includes('news') ||
-      name.includes('community') ||
-      name.includes('hackers') ||
       name.includes('cat') ||
       name.includes('feline') ||
-      name.includes('pet')
+      name.includes('pet') ||
+      name.includes('purr') ||
+      name.includes('kitten')
     ) {
+      return 'Pets';
+    }
+    if (name.includes('blog') || name.includes('news') || name.includes('community') || name.includes('hackers')) {
       return 'Community';
     }
     return 'Niche';
@@ -82,6 +83,8 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
         return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
       case 'Community':
         return 'bg-pink-500/20 text-pink-300 border-pink-500/30';
+      case 'Pets':
+        return 'bg-violet-500/20 text-violet-300 border-violet-500/30';
       default:
         return 'bg-slate-500/20 text-slate-300 border-slate-500/30';
     }
@@ -103,8 +106,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/30';
       case 'pending':
         return 'bg-amber-500/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/30';
-      case 'pets':
-        return 'bg-pink-500/20 text-pink-300 border-pink-500/30 hover:bg-pink-500/30';
       case 'rejected':
         return 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30';
       default:
@@ -122,7 +123,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
 
   const totalDirectories = submissions.length;
   const pendingCount = submissions.filter((sub) => sub.status === 'pending').length;
-  const petCount = submissions.filter((sub) => sub.status === 'pets').length;
+  const petCount = submissions.filter((sub) => getFocusArea(sub) === 'Pets').length;
   const aiGeneratedCount = submissions.filter((sub) => sub.aiStatus === 'generated').length;
   const aiDraftCount = submissions.filter((sub) => sub.aiStatus === 'draft').length;
 
@@ -149,8 +150,10 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
   });
 
   return (
-    <Card className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-slate-700/50 backdrop-blur-sm shadow-2xl">
-      <CardHeader>
+    <Card className="relative overflow-hidden border-slate-800/60 bg-slate-950/85 backdrop-blur-xl shadow-2xl shadow-cyan-500/10">
+      <div className="pointer-events-none absolute -top-24 right-0 h-48 w-48 rounded-full bg-cyan-500/25 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 left-6 h-52 w-52 rounded-full bg-blue-500/20 blur-3xl" />
+      <CardHeader className="relative">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <CardTitle className="text-2xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
@@ -180,7 +183,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                 <SelectItem value="submitted">Submitted</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="pets">Pet Audience</SelectItem>
               </SelectContent>
             </Select>
             <Select value={sortBy} onValueChange={setSortBy}>
@@ -198,15 +200,16 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
       </CardHeader>
       <CardContent>
         {essentialHighlights.length > 0 && (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 mb-6">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6">
             {essentialHighlights.map((highlight) => {
               const tier = getTier(highlight);
               const focus = getFocusArea(highlight);
               return (
                 <div
                   key={highlight.id}
-                  className="rounded-xl border border-blue-500/30 bg-slate-900/70 p-4 backdrop-blur-sm shadow-lg shadow-blue-500/10 hover:border-blue-400/60 transition-all"
+                  className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-950/70 p-5 shadow-inner shadow-cyan-500/10 transition-all hover:border-cyan-400/60"
                 >
+                  <div className="pointer-events-none absolute -top-16 right-0 h-28 w-28 rounded-full bg-cyan-500/25 blur-3xl" />
                   <div className="flex items-center justify-between text-xs uppercase tracking-wide text-slate-400">
                     <span className="flex items-center gap-2">
                       <Badge variant="outline" className={`font-semibold ${getTierColor(tier)}`}>

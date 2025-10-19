@@ -29,14 +29,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Sparkles, TrendingUp, Compass, Layers } from 'lucide-react';
+import { Sparkles, TrendingUp, Compass, Layers, Cat, GaugeCircle } from 'lucide-react';
 
 const statusPalette: Record<DirectorySubmission['status'], string> = {
   approved: '#34d399',
   submitted: '#60a5fa',
   pending: '#facc15',
   rejected: '#f87171',
-  pets: '#f472b6',
 };
 
 const formatDayLabel = (date: Date) =>
@@ -60,6 +59,15 @@ const getFocusArea = (submission: DirectorySubmission): NonNullable<DirectorySub
   if (name.includes('product') || name.includes('software') || name.includes('app')) {
     return 'Product';
   }
+  if (
+    name.includes('cat') ||
+    name.includes('feline') ||
+    name.includes('pet') ||
+    name.includes('purr') ||
+    name.includes('kitten')
+  ) {
+    return 'Pets';
+  }
   if (name.includes('blog') || name.includes('news') || name.includes('community') || name.includes('hackers') || name.includes('social')) {
     return 'Community';
   }
@@ -78,12 +86,11 @@ export default function Page() {
       submitted: 0,
       pending: 0,
       rejected: 0,
-      pets: 0,
     },
   );
 
   const pendingCount = statusCounts.pending ?? 0;
-  const petsCount = statusCounts.pets ?? 0;
+  const petFocusCount = mockDirectorySubmissions.filter((submission) => getFocusArea(submission) === 'Pets').length;
   const averageDomainAuthority = Math.round(
     mockDirectorySubmissions.reduce((acc, submission) => acc + submission.domainAuthority, 0) / totalSubmissions,
   );
@@ -116,6 +123,27 @@ export default function Page() {
     .sort((a, b) => b.directories - a.directories)
     .slice(0, 5);
 
+  const highlightInsights = [
+    {
+      title: 'Anthropic drafts ready',
+      value: `${aiSummary.uniqueDescriptions}`,
+      description: 'Listings already feature bespoke copy ready to ship.',
+      icon: Sparkles,
+    },
+    {
+      title: 'Launch queue',
+      value: `${pendingCount}`,
+      description: 'Directories staged for rollout in the next sprint.',
+      icon: GaugeCircle,
+    },
+    {
+      title: 'Cat community reach',
+      value: `${petFocusCount}`,
+      description: 'High-trust placements tuned to feline guardians.',
+      icon: Cat,
+    },
+  ];
+
   const submissionTrendMap = mockDirectorySubmissions.reduce(
     (acc, submission) => {
       const iso = submission.submissionDate.toISOString().slice(0, 10);
@@ -137,7 +165,7 @@ export default function Page() {
       submissions: entry.submissions,
     }));
 
-  const statusBreakdown = (['pending', 'pets', 'submitted', 'approved', 'rejected'] as DirectorySubmission['status'][])
+  const statusBreakdown = (['pending', 'submitted', 'approved', 'rejected'] as DirectorySubmission['status'][])
     .map((status) => ({
       status,
       value: statusCounts[status] ?? 0,
@@ -149,11 +177,16 @@ export default function Page() {
     .sort((a, b) => b.domainAuthority - a.domainAuthority)
     .slice(0, 5);
 
-  const communityCoverage = mockDirectorySubmissions.filter((submission) => getFocusArea(submission) === 'Community').length;
+  const petCoverage = mockDirectorySubmissions.filter((submission) => getFocusArea(submission) === 'Pets').length;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-    <div className="mx-auto max-w-7xl px-6 py-12 space-y-10">
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-40 -left-28 h-[520px] w-[520px] rounded-full bg-cyan-500/20 blur-3xl" />
+        <div className="absolute top-1/2 right-[-160px] h-[460px] w-[460px] -translate-y-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
+        <div className="absolute bottom-[-200px] left-1/3 h-[380px] w-[380px] rounded-full bg-purple-500/25 blur-3xl" />
+      </div>
+      <div className="relative mx-auto max-w-7xl px-6 py-12 space-y-10">
       <section>
         <DirectorySubmissions submissions={mockDirectorySubmissions} />
       </section>
@@ -174,22 +207,34 @@ export default function Page() {
                   </CardDescription>
                 </div>
               </div>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">Pending queue</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-100">{pendingCount}</p>
-                  <p className="text-xs text-slate-400">Directories and channels waiting for launch</p>
-                </div>
-                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">Pet network</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-100">{petsCount}</p>
-                  <p className="text-xs text-slate-400">Cat parent touchpoints ready for outreach</p>
-                </div>
-                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">Avg. domain authority</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-100">{averageDomainAuthority}</p>
-                  <p className="text-xs text-slate-400">Across {totalSubmissions} placements</p>
-                </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {[
+                  {
+                    label: 'Pending queue',
+                    value: pendingCount,
+                    description: 'Directories and channels waiting for launch',
+                  },
+                  {
+                    label: 'Pet network',
+                    value: petFocusCount,
+                    description: 'Cat parent touchpoints ready for outreach',
+                  },
+                  {
+                    label: 'Avg. domain authority',
+                    value: averageDomainAuthority,
+                    description: `Across ${totalSubmissions} placements`,
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-950/70 p-5 shadow-inner shadow-cyan-500/10"
+                  >
+                    <div className="pointer-events-none absolute -top-16 right-0 h-28 w-28 rounded-full bg-cyan-500/25 blur-3xl" />
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{item.label}</p>
+                    <p className="mt-2 text-3xl font-bold text-slate-50">{item.value}</p>
+                    <p className="mt-1 text-xs text-slate-400">{item.description}</p>
+                  </div>
+                ))}
               </div>
             </CardHeader>
           </Card>
@@ -221,6 +266,28 @@ export default function Page() {
           </Card>
         </section>
 
+        <section className="grid gap-4 md:grid-cols-3">
+          {highlightInsights.map(({ title, value, description, icon: Icon }) => (
+            <div
+              key={title}
+              className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-950/75 p-5 backdrop-blur-xl transition-all duration-500 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-500/20"
+            >
+              <div className="pointer-events-none absolute -right-10 top-6 h-28 w-28 rounded-full bg-cyan-500/20 blur-3xl" />
+              <div className="pointer-events-none absolute -left-8 -bottom-10 h-24 w-24 rounded-full bg-blue-500/20 blur-3xl" />
+              <div className="relative flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</p>
+                  <p className="mt-2 text-3xl font-bold text-slate-50">{value}</p>
+                  <p className="mt-2 text-sm text-slate-400 leading-6">{description}</p>
+                </div>
+                <span className="rounded-full bg-slate-900/70 p-2 text-cyan-300">
+                  <Icon className="h-5 w-5" />
+                </span>
+              </div>
+            </div>
+          ))}
+        </section>
+
         <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard
             title="Pending directories"
@@ -231,7 +298,7 @@ export default function Page() {
           />
           <MetricCard
             title="Pet audience outlets"
-            value={petsCount}
+            value={petFocusCount}
             description="Cat-focused communities ready for placement"
             icon={Compass}
             trend={{ value: 7, isPositive: true }}
@@ -244,8 +311,8 @@ export default function Page() {
             trend={{ value: 8, isPositive: true }}
           />
           <MetricCard
-            title="Community platforms"
-            value={communityCoverage}
+            title="Pet platforms"
+            value={petCoverage}
             description="Social and community channels aligned to cats"
             icon={Layers}
             trend={{ value: 4, isPositive: true }}

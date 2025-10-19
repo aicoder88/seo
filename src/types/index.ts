@@ -3,11 +3,11 @@ export interface DirectorySubmission {
   directoryName: string;
   url: string;
   domainAuthority: number;
-  status: 'pending' | 'submitted' | 'approved' | 'rejected' | 'pets';
+  status: 'pending' | 'submitted' | 'approved' | 'rejected';
   submissionDate: Date;
   nextResubmission?: Date;
   tier?: 'Essential' | 'High Impact' | 'Growth';
-  focusArea?: 'Local' | 'Startup' | 'Product' | 'Review' | 'Community' | 'Niche';
+  focusArea?: 'Local' | 'Startup' | 'Product' | 'Review' | 'Community' | 'Pets' | 'Niche';
   automation?: 'auto' | 'manual';
   notes?: string;
   aiDescription?: string;

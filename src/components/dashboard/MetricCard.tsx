@@ -14,30 +14,30 @@ interface MetricCardProps {
 
 export default function MetricCard({ title, value, description, icon: Icon, trend }: MetricCardProps) {
   return (
-    <Card className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-slate-700/50 backdrop-blur-sm hover:border-blue-500/50 transition-all duration-300 shadow-xl hover:shadow-blue-500/10">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-slate-300">{title}</CardTitle>
-        <div className="p-2 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg">
-          <Icon className="h-4 w-4 text-blue-400" />
+    <Card className="relative group overflow-hidden border-slate-800/60 bg-slate-950/80 backdrop-blur-xl transition-all duration-500 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-500/20">
+      <div className="pointer-events-none absolute -top-10 right-0 h-28 w-28 rounded-full bg-gradient-to-br from-cyan-500/40 to-emerald-400/20 blur-3xl opacity-70 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute -bottom-16 left-4 h-32 w-32 rounded-full bg-gradient-to-tr from-blue-500/30 to-indigo-400/10 blur-3xl opacity-60" />
+      <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-semibold tracking-wide text-slate-200/90 uppercase">{title}</CardTitle>
+        <div className="rounded-xl bg-slate-900/60 p-2 shadow-inner shadow-sky-500/10">
+          <Icon className="h-4 w-4 text-cyan-300" />
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-          {value}
-        </div>
-        {description && (
-          <p className="text-xs text-slate-400 mt-1">{description}</p>
-        )}
+      <CardContent className="relative space-y-3">
+        <p className="text-4xl font-bold tracking-tight text-slate-50">{value}</p>
+        {description && <p className="text-xs text-slate-400/90 leading-relaxed">{description}</p>}
         {trend && (
-          <div className="flex items-center mt-2">
+          <div className="flex items-center gap-2 text-xs">
             <span
-              className={`text-xs font-medium ${
-                trend.isPositive ? 'text-emerald-400' : 'text-red-400'
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-medium ${
+                trend.isPositive
+                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20'
+                  : 'bg-rose-500/15 text-rose-300 border border-rose-500/20'
               }`}
             >
-              {trend.isPositive ? '↑' : '↓'} {trend.value}%
+              {trend.isPositive ? '▲' : '▼'} {trend.value}%
             </span>
-            <span className="text-xs text-slate-500 ml-1">from last month</span>
+            <span className="text-slate-500">vs. last month</span>
           </div>
         )}
       </CardContent>
