@@ -123,26 +123,6 @@ export default function Page() {
     .sort((a, b) => b.directories - a.directories)
     .slice(0, 5);
 
-  const highlightInsights = [
-    {
-      title: 'Anthropic drafts ready',
-      value: `${aiSummary.uniqueDescriptions}`,
-      description: 'Listings already feature bespoke copy ready to ship.',
-      icon: Sparkles,
-    },
-    {
-      title: 'Launch queue',
-      value: `${pendingCount}`,
-      description: 'Directories staged for rollout in the next sprint.',
-      icon: GaugeCircle,
-    },
-    {
-      title: 'Cat community reach',
-      value: `${petFocusCount}`,
-      description: 'High-trust placements tuned to feline guardians.',
-      icon: Cat,
-    },
-  ];
 
   const submissionTrendMap = mockDirectorySubmissions.reduce(
     (acc, submission) => {
@@ -187,57 +167,8 @@ export default function Page() {
           <DirectorySubmissions submissions={mockDirectorySubmissions} />
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          {highlightInsights.map(({ title, value, description, icon: Icon }) => (
-            <div
-              key={title}
-              className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-950/75 p-5 backdrop-blur-xl transition-all duration-500 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-500/20"
-            >
-              <div className="pointer-events-none absolute -right-10 top-6 h-28 w-28 rounded-full bg-cyan-500/20 blur-3xl" />
-              <div className="pointer-events-none absolute -left-8 -bottom-10 h-24 w-24 rounded-full bg-blue-500/20 blur-3xl" />
-              <div className="relative flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</p>
-                  <p className="mt-2 text-3xl font-bold text-slate-50">{value}</p>
-                  <p className="mt-2 text-sm text-slate-400 leading-6">{description}</p>
-                </div>
-                <span className="rounded-full bg-slate-900/70 p-2 text-cyan-300">
-                  <Icon className="h-5 w-5" />
-                </span>
-              </div>
-            </div>
-          ))}
-        </section>
-
-        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            title="Pending directories"
-            value={pendingCount}
-            description="Listings staged for activation"
-            icon={TrendingUp}
-            trend={{ value: 5, isPositive: true }}
-          />
-          <MetricCard
-            title="Pet audience outlets"
-            value={petFocusCount}
-            description="Cat-focused communities ready for placement"
-            icon={Compass}
-            trend={{ value: 7, isPositive: true }}
-          />
-          <MetricCard
-            title="Anthropic coverage"
-            value={`${anthropicCoverage}%`}
-            description={`${aiSummary.uniqueDescriptions} listings with unique descriptions`}
-            icon={Sparkles}
-            trend={{ value: 8, isPositive: true }}
-          />
-          <MetricCard
-            title="Pet platforms"
-            value={petCoverage}
-            description="Social and community channels aligned to cats"
-            icon={Layers}
-            trend={{ value: 4, isPositive: true }}
-          />
+        <section>
+          <DirectorySubmissions submissions={mockDirectorySubmissions} />
         </section>
 
         <section className="grid gap-6 xl:grid-cols-3">
