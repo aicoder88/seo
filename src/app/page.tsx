@@ -173,10 +173,6 @@ export default function Page() {
     }))
     .filter((item) => item.value > 0);
 
-  const topListings = [...mockDirectorySubmissions]
-    .sort((a, b) => b.domainAuthority - a.domainAuthority)
-    .slice(0, 5);
-
   const petCoverage = mockDirectorySubmissions.filter((submission) => getFocusArea(submission) === 'Pets').length;
 
   return (
@@ -187,83 +183,8 @@ export default function Page() {
         <div className="absolute bottom-[-200px] left-1/3 h-[380px] w-[380px] rounded-full bg-purple-500/25 blur-3xl" />
       </div>
       <div className="relative mx-auto max-w-7xl px-6 py-12 space-y-10">
-      <section>
-        <DirectorySubmissions submissions={mockDirectorySubmissions} />
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-          <Card className="border-slate-800 bg-slate-900/90">
-            <CardHeader className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-blue-500/20 p-3">
-                  <Sparkles className="h-7 w-7 text-blue-300" />
-                </div>
-                <div>
-                  <CardTitle className="text-4xl font-bold tracking-tight text-slate-100">
-                    SEMsubmit
-                  </CardTitle>
-                  <CardDescription className="text-base text-slate-400">
-                    A calm command center for every live profile, social launch, and Anthropic-ready description.
-                  </CardDescription>
-                </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {[
-                  {
-                    label: 'Pending queue',
-                    value: pendingCount,
-                    description: 'Directories and channels waiting for launch',
-                  },
-                  {
-                    label: 'Pet network',
-                    value: petFocusCount,
-                    description: 'Cat parent touchpoints ready for outreach',
-                  },
-                  {
-                    label: 'Avg. domain authority',
-                    value: averageDomainAuthority,
-                    description: `Across ${totalSubmissions} placements`,
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-950/70 p-5 shadow-inner shadow-cyan-500/10"
-                  >
-                    <div className="pointer-events-none absolute -top-16 right-0 h-28 w-28 rounded-full bg-cyan-500/25 blur-3xl" />
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{item.label}</p>
-                    <p className="mt-2 text-3xl font-bold text-slate-50">{item.value}</p>
-                    <p className="mt-1 text-xs text-slate-400">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </CardHeader>
-          </Card>
-
-          <Card className="border-slate-800 bg-slate-900/90">
-            <CardHeader>
-              <CardTitle className="text-xl text-slate-100">Top live placements</CardTitle>
-              <CardDescription className="text-slate-400">High-authority profiles worth showcasing</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {topListings.map((listing) => (
-                <div key={listing.id} className="flex items-center justify-between gap-3 rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-slate-100">{listing.directoryName}</p>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                      <Badge variant="outline" className="border-slate-700 text-slate-300">
-                        {listing.status}
-                      </Badge>
-                      <span>Focus: {getFocusArea(listing)}</span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs uppercase text-slate-500">DA</p>
-                    <p className="text-xl font-semibold text-emerald-300">{listing.domainAuthority}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+        <section>
+          <DirectorySubmissions submissions={mockDirectorySubmissions} />
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">

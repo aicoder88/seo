@@ -17,12 +17,17 @@ interface DirectorySubmissionsProps {
   submissions: DirectorySubmission[];
 }
 
+type SortKey = 'directory' | 'tier' | 'focus' | 'da' | 'status' | 'updated';
+
 export default function DirectorySubmissions({ submissions = [] }: DirectorySubmissionsProps) {
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('da');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeAiSubmission, setActiveAiSubmission] = useState<DirectorySubmission | null>(null);
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'asc' | 'desc' }>({
+    key: 'da',
+    direction: 'desc',
+  });
 
   const getTier = (submission: DirectorySubmission) => {
     if (submission.tier) return submission.tier;
@@ -139,15 +144,50 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
   });
 
   const sortedSubmissions = [...filteredSubmissions].sort((a, b) => {
-    if (sortBy === 'date') {
-      return b.submissionDate.getTime() - a.submissionDate.getTime();
-    } else if (sortBy === 'da') {
-      return b.domainAuthority - a.domainAuthority;
-    } else if (sortBy === 'name') {
-      return a.directoryName.localeCompare(b.directoryName);
+    let comparison = 0;
+    switch (sortConfig.key) {
+      case 'directory':
+        comparison = a.directoryName.localeCompare(b.directoryName);
+        break;
+      case 'tier':
+        comparison = getTier(a).localeCompare(getTier(b));
+        break;
+      case 'focus':
+        comparison = getFocusArea(a).localeCompare(getFocusArea(b));
+        break;
+      case 'da':
+        comparison = a.domainAuthority - b.domainAuthority;
+        break;
+      case 'status':
+        comparison = a.status.localeCompare(b.status);
+        break;
+      case 'updated':
+        comparison = a.submissionDate.getTime() - b.submissionDate.getTime();
+        break;
+      default:
+        comparison = 0;
     }
-    return 0;
+    return sortConfig.direction === 'asc' ? comparison : -comparison;
   });
+
+  const toggleSort = (key: SortKey) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      }
+      const defaultDirection = key === 'da' || key === 'updated' ? 'desc' : 'asc';
+      return { key, direction: defaultDirection };
+    });
+  };
+
+  const renderSortIndicator = (key: SortKey) => {
+    if (sortConfig.key !== key) return <span className="text-slate-600">↕</span>;
+    return sortConfig.direction === 'asc' ? (
+      <span className="text-cyan-300">↑</span>
+    ) : (
+      <span className="text-cyan-300">↓</span>
+    );
+  };
 
   return (
     <Card className="relative overflow-hidden border-slate-800/60 bg-slate-950/85 backdrop-blur-xl shadow-2xl shadow-cyan-500/10">
@@ -163,7 +203,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
               Top {totalDirectories} directories and channels • {pendingCount} awaiting launch • {petCount} tuned for cat guardians • {aiGeneratedCount} with Anthropic copy
             </CardDescription>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex flex-wrap gap-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
@@ -183,16 +223,6 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
                 <SelectItem value="submitted">Submitted</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px] bg-slate-800/50 border-slate-700 text-slate-200">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700">
-                <SelectItem value="da">Domain Authority</SelectItem>
-                <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="name">Name</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -264,12 +294,60 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
             <Table>
               <TableHeader className="sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10">
                 <TableRow className="border-slate-700/50 hover:bg-slate-800/50">
-                  <TableHead className="text-slate-300">Directory</TableHead>
-                  <TableHead className="text-slate-300">Tier</TableHead>
-                  <TableHead className="text-slate-300">Focus</TableHead>
-                  <TableHead className="text-slate-300">DA Score</TableHead>
-                  <TableHead className="text-slate-300">Status</TableHead>
-                  <TableHead className="text-slate-300">Last Updated</TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('directory')}
+                      className="flex items-center gap-1 text-slate-300"
+                    >
+                      Directory {renderSortIndicator('directory')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('tier')}
+                      className="flex items-center gap-1 text-slate-300"
+                    >
+                      Tier {renderSortIndicator('tier')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('focus')}
+                      className="flex items-center gap-1 text-slate-300"
+                    >
+                      Focus {renderSortIndicator('focus')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('da')}
+                      className="flex items-center gap-1 text-slate-300"
+                    >
+                      DA Score {renderSortIndicator('da')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('status')}
+                      className="flex items-center gap-1 text-slate-300"
+                    >
+                      Status {renderSortIndicator('status')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('updated')}
+                      className="flex items-center gap-1 text-slate-300"
+                    >
+                      Last Updated {renderSortIndicator('updated')}
+                    </button>
+                  </TableHead>
                   <TableHead className="text-slate-300">Content</TableHead>
                 </TableRow>
               </TableHeader>
