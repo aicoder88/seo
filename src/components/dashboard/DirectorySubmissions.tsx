@@ -2,13 +2,11 @@
 
 import { useState } from 'react';
 import { DirectorySubmission } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ExternalLink, Search, Sparkles } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { ExternalLink, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -20,8 +18,6 @@ interface DirectorySubmissionsProps {
 type SortKey = 'directory' | 'tier' | 'focus' | 'da' | 'status' | 'updated';
 
 export default function DirectorySubmissions({ submissions = [] }: DirectorySubmissionsProps) {
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [activeAiSubmission, setActiveAiSubmission] = useState<DirectorySubmission | null>(null);
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'asc' | 'desc' }>({
@@ -126,13 +122,7 @@ export default function DirectorySubmissions({ submissions = [] }: DirectorySubm
     return 'bg-slate-500/20 text-slate-300 border-slate-500/30';
   };
 
-  const filteredSubmissions = submissions.filter((sub) => {
-    const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
-    const matchesSearch = sub.directoryName.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
-
-  const sortedSubmissions = [...filteredSubmissions].sort((a, b) => {
+  const sortedSubmissions = [...submissions].sort((a, b) => {
     let comparison = 0;
     switch (sortConfig.key) {
       case 'directory':
